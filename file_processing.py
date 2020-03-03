@@ -1,6 +1,8 @@
 import csv
 import pandas
-from config import FILENAME
+import configreader as cfg
+
+FILENAME = cfg.FILENAME
 
 
 def write_output(frequency, spectral_density, method):
