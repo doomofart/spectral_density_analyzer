@@ -1,8 +1,11 @@
 import csv
 import pandas
-import configreader as cfg
+import configparser
 
-FILENAME = cfg.FILENAME
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+FILENAME = config.get('GLOBAL', 'FILENAME')
 
 
 def write_output(frequency, spectral_density, method):
