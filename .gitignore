@@ -1,5 +1,6 @@
 *.apk
 *.dat
+*.csv
 *.sta
 .idea/
 results/
