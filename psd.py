@@ -20,11 +20,9 @@ def initial_signal(x_values, y_values):
 
 def custom(values):
     section = 'CUSTOM'
-    signal = numpy.array(values, dtype=float)
-    n = signal.size
     spectral_density, frequency = [], []
     spectral_density_total = abs(numpy.fft.fft(values))
-    frequency_total = (numpy.fft.fftfreq(n))
+    frequency_total = (numpy.fft.fftfreq(len(values)))
     for i in range(len(frequency_total)):
         if frequency_total[i] >= 0:
             spectral_density.append(spectral_density_total[i])
@@ -42,7 +40,7 @@ def custom(values):
 
 def welch(values):
     section = 'WELCH'
-    spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window="hamming", nperseg=470)
+    spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window="hamming", nperseg=len(values))
     frequency = spectral_density_welch[0]
     spectral_density = spectral_density_welch[1]
     if config.get(section, 'OUTPUT_SAVE') == '1':
