@@ -8,7 +8,7 @@ config.read('config.ini')
 FILENAME = config.get('GLOBAL', 'FILENAME')
 
 
-def write_output(frequency, spectral_density, method):
+def write_output(frequency, spectral_density, method, window=None):
     col1, col2 = [], []
     for elem in frequency:
         col1.append(str(elem).replace('.', ','))
@@ -17,7 +17,10 @@ def write_output(frequency, spectral_density, method):
     filename = FILENAME.split('.')[0]
     data = dict(col1=col1, col2=col2)
     frame = pandas.DataFrame(data)
-    frame.to_csv('%s_%s_out.csv' % (filename, method), index=False, sep='\t', header=False)
+    if window is not None:
+        frame.to_csv('%s_%s_%s_out.csv' % (filename, method, window), index=False, sep='\t', header=False)
+    else:
+        frame.to_csv('%s_%s_out.csv' % (filename, method), index=False, sep='\t', header=False)
 
 
 x_values, y_values = [], []

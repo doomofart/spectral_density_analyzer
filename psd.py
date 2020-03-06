@@ -40,11 +40,13 @@ def custom(values):
 
 def welch(values):
     section = 'WELCH'
-    spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window='hamming', nperseg=len(values))
+    window = config.get(section, 'WINDOW')
+    spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window=window,
+                                          nperseg=len(values))
     frequency = spectral_density_welch[0]
     spectral_density = spectral_density_welch[1]
     if config.get(section, 'OUTPUT_SAVE') == '1':
-        fp.write_output(frequency, spectral_density, section.lower())
+        fp.write_output(frequency, spectral_density, section.lower(), window)
     elif config.get(section, 'OUTPUT_SAVE') != '0':
         logger.value_error(section)
     if config.get(section, 'PLOT_SHOW') == '1':
@@ -56,11 +58,12 @@ def welch(values):
 
 def periodogram(values):
     section = 'PERIODOGRAM'
-    spectral_density_period = signal.periodogram(values, fs=1.0, scaling='density', window="hamming")
+    window = config.get(section, 'WINDOW')
+    spectral_density_period = signal.periodogram(values, fs=1.0, scaling='density', window=window)
     frequency = spectral_density_period[0]
     spectral_density = spectral_density_period[1]
     if config.get(section, 'OUTPUT_SAVE') == '1':
-        fp.write_output(frequency, spectral_density, section.lower())
+        fp.write_output(frequency, spectral_density, section.lower(), window)
     elif config.get(section, 'OUTPUT_SAVE') != '0':
         logger.value_error(section)
     if config.get(section, 'PLOT_SHOW') == '1':
