@@ -40,7 +40,7 @@ def custom(values):
 
 def welch(values):
     section = 'WELCH'
-    spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window="hamming", nperseg=len(values))
+    spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window='hamming', nperseg=len(values))
     frequency = spectral_density_welch[0]
     spectral_density = spectral_density_welch[1]
     if config.get(section, 'OUTPUT_SAVE') == '1':

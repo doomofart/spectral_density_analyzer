@@ -9,8 +9,13 @@ FILENAME = config.get('GLOBAL', 'FILENAME')
 
 
 def write_output(frequency, spectral_density, method):
+    col1, col2 = [], []
+    for elem in frequency:
+        col1.append(str(elem).replace('.', ','))
+    for elem in spectral_density:
+        col2.append(str(elem).replace('.', ','))
     filename = FILENAME.split('.')[0]
-    data = dict(col1=frequency, col2=spectral_density)
+    data = dict(col1=col1, col2=col2)
     frame = pandas.DataFrame(data)
     frame.to_csv('%s_%s_out.csv' % (filename, method), index=False, sep='\t', header=False)
 
