@@ -11,14 +11,16 @@ FILENAME = PATH.split('/')[-1]
 
 def write_output(frequency, spectral_density, method, window=None):
     filename = FILENAME.split('.')[0]
-    data = dict(col1=frequency, col2=spectral_density)
+    data = dict(frequency=frequency, spectral_density=spectral_density)
     frame = pd.DataFrame(data)
     if not os.path.exists('output'):
         os.mkdir('output')
     if window is not None:
-        frame.to_csv('output/%s_%s_%s_out.csv' % (filename, method, window), index=False, sep='\t', header=False)
+        writer = pd.ExcelWriter('output/%s_%s_%s_out.xlsx' % (filename, method, window))
     else:
-        frame.to_csv('output/%s_%s_out.csv' % (filename, method), index=False, sep='\t', header=False)
+        writer = pd.ExcelWriter('output/%s_%s_out.xlsx' % (filename, method))
+    frame.to_excel(writer, index=None)
+    writer.save()
 
 
 with open(PATH, 'r') as file:
