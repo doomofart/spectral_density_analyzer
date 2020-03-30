@@ -21,17 +21,21 @@ def write_output(frequency, spectral_density, method, window=None):
     else:
         writer = pd.ExcelWriter('output/%s_%s_out.xlsx' % (filename, method), engine='xlsxwriter')
     frame.to_excel(writer, index=None, sheet_name='SpectralDensity')
+    
     workbook = writer.book
     worksheet = writer.sheets['SpectralDensity']
-    chart = workbook.add_chart({'type': 'line'})
+    chart = workbook.add_chart({'type': 'scatter'})
     chart.add_series({
         'categories': ['SpectralDensity', 1, 0, len_frame, 0],
         'values': ['SpectralDensity', 1, 1, len_frame, 1],
     })
-    chart.set_x_axis({'name': 'Frequency', 'position_axis': 'on_tick'})
-    chart.set_y_axis({'name': 'Spectral Density', 'major_gridlines': {'visible': False}})
+    chart.set_x_axis({'name': 'Frequency', 'major_unit': 0.1, 'minor_unit': 0.01, 'max': 0.5,
+                      'position_axis': 'on_tick'})
+    chart.set_y_axis({'name': 'Spectral Density', 'num_format': '0.00E+00', 'major_gridlines': {'visible': False}})
     chart.set_legend({'position': 'none'})
+    chart.set_size({'width': 640, 'height': 480})
     worksheet.insert_chart('D2', chart)
+
     writer.save()
 
 
