@@ -24,17 +24,38 @@ def write_output(frequency, spectral_density, method, window=None):
     
     workbook = writer.book
     worksheet = writer.sheets['SpectralDensity']
-    chart = workbook.add_chart({'type': 'scatter'})
-    chart.add_series({
+    spectral_density_chart = workbook.add_chart({'type': 'scatter'})
+    spectral_density_chart.add_series({
         'categories': ['SpectralDensity', 1, 0, len_frame, 0],
         'values': ['SpectralDensity', 1, 1, len_frame, 1],
     })
-    chart.set_x_axis({'name': 'Frequency', 'major_unit': 0.1, 'minor_unit': 0.01, 'max': 0.5,
+    spectral_density_chart.set_x_axis({'name': 'Frequency', 'major_unit': 0.1, 'minor_unit': 0.01, 'max': 0.5,
                       'position_axis': 'on_tick'})
-    chart.set_y_axis({'name': 'Spectral Density', 'num_format': '0.00E+00', 'major_gridlines': {'visible': False}})
-    chart.set_legend({'position': 'none'})
-    chart.set_size({'width': 640, 'height': 480})
-    worksheet.insert_chart('D2', chart)
+    spectral_density_chart.set_y_axis({'name': 'Spectral Density', 'num_format': '0.00E+00', 'major_gridlines': {'visible': False}})
+    spectral_density_chart.set_legend({'position': 'none'})
+    spectral_density_chart.set_size({'width': 640, 'height': 480})
+    worksheet.insert_chart('D2', spectral_density_chart)
+
+    spectral_density_log_chart = workbook.add_chart({'type': 'scatter'})
+    spectral_density_log_chart.add_series({
+        'categories': ['SpectralDensity', 2, 0, len_frame, 0],
+        'values': ['SpectralDensity', 2, 1, len_frame, 1],
+        'trendline': {
+            'type': 'power',
+            'display_equation': True}
+    })
+    spectral_density_log_chart.set_x_axis({'name': 'Frequency (log)',
+                                           'log_base': 10,
+                                           'major_unit': 0.1,
+                                           'minor_unit': 0.01,
+                                           'max': 0.5,
+                                           'position_axis': 'on_tick'})
+    spectral_density_log_chart.set_y_axis(
+        {'name': 'Spectral Density (log)', 'log_base': 10, 'num_format': '0.00E+00',
+         'major_gridlines': {'visible': False}})
+    spectral_density_log_chart.set_legend({'position': 'none'})
+    spectral_density_log_chart.set_size({'width': 640, 'height': 480})
+    worksheet.insert_chart('D27', spectral_density_log_chart)
 
     writer.save()
 
