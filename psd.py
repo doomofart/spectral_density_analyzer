@@ -38,7 +38,7 @@ def custom(values):
     return None
 
 
-def welch(values):
+def welch(x, y, values):
     section = 'WELCH'
     window = config.get(section, 'WINDOW')
     spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window=window,
@@ -46,7 +46,7 @@ def welch(values):
     frequency = spectral_density_welch[0]
     spectral_density = spectral_density_welch[1]
     if config.get(section, 'OUTPUT_SAVE') == '1':
-        fp.write_output(frequency, spectral_density, section.lower(), window)
+        fp.write_output(x, y, frequency, spectral_density, section.lower(), window)
     elif config.get(section, 'OUTPUT_SAVE') != '0':
         logger.value_error(section)
     if config.get(section, 'PLOT_SHOW') == '1':
