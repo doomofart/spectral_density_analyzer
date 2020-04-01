@@ -34,7 +34,7 @@ def write_output(x_values, y_values, frequency, spectral_density, method, window
 
     workbook = writer.book
 
-    # trrash
+    # trash
     worksheet = writer.sheets['TimeSeries']
     time_series_chart = workbook.add_chart({'type': 'scatter'})
     time_series_chart.add_series({
