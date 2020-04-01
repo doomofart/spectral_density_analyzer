@@ -34,7 +34,7 @@ def write_output(x_values, y_values, frequency, spectral_density, method, window
 
     workbook = writer.book
 
-    # trash
+    # trrash
     worksheet = writer.sheets['TimeSeries']
     time_series_chart = workbook.add_chart({'type': 'scatter'})
     time_series_chart.add_series({
@@ -67,7 +67,8 @@ def write_output(x_values, y_values, frequency, spectral_density, method, window
         'values': ['SpectralDensity', 2, 1, len_frame, 1],
         'trendline': {
             'type': 'power',
-            'display_equation': True}
+            'display_equation': True,
+            'display_r_squared': True}
     })
     spectral_density_log_chart.set_x_axis({'name': 'Frequency (log)',
                                            'log_base': 10,
