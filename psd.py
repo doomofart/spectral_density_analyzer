@@ -1,4 +1,4 @@
-import numpy.fft
+import prox_tv as ptv
 import graph
 from scipy import signal
 import file_processing as fp
@@ -15,7 +15,10 @@ def initial_signal(x_values, y_values):
         graph.time_series(x_values, y_values)
     elif config.get(section, 'PLOT_SHOW') != '0':
         logger.value_error(section)
-    return None
+    if config.get(section, 'FILTER') == '1':
+        filtered_frequency = config.get(section, 'FILTERED_FREQUENCY')
+        y_values = ptv.tv1_1d(y_values, filtered_frequency)
+    return dict(x=x_values, y=y_values)
 
 
 def welch(x, y, values):
@@ -33,4 +36,4 @@ def welch(x, y, values):
         graph.psd(frequency, spectral_density)
     elif config.get(section, 'PLOT_SHOW') != '0':
         logger.value_error(section)
-    return None
+    return dict(frequency=frequency, spectral_density=spectral_density)
