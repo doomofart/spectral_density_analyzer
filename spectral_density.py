@@ -1,7 +1,7 @@
-import psd
-import file_processing as fp
+import configparser
+import builder as bld
+config = configparser.ConfigParser()
+config.read('config.ini')
 
-x_values, y_values = fp.x_values, fp.y_values
-
-psd.initial_signal(x_values, y_values)
-psd.welch(x_values, y_values, y_values)
+for section in config.sections():
+    bld.ExcelBuilder(section)
