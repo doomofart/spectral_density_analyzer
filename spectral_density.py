@@ -1,7 +1,8 @@
 import configparser
 import builder as bld
-config = configparser.ConfigParser()
-config.read('config.ini')
 
-for section in config.sections():
-    bld.ExcelBuilder(section)
+cfg = configparser.ConfigParser()
+cfg.read('config.ini')
+
+for section in cfg.sections():
+    bld.ExcelBuilder(cfg, section)

@@ -1,29 +1,25 @@
 import os
 import pandas as pd
-import configparser
-
-cfg = configparser.ConfigParser()
-cfg.read('config.ini')
 
 
 class ExcelBuilder(object):
-    def __init__(self, section):
+    def __init__(self, cfg, section):
+        self.cfg = cfg
         self.section = section
 
     def file_reader(self):
-        PATH = cfg.get(self.section, 'PATH')
-        FILENAME = PATH.split('/')[-1]
-        with open(PATH, 'r') as file:
-            reader = pd.read_csv(file, header=None, delimiter='\t')
-            col_num = reader.shape[1]
-            if col_num >= 2:
-                x_values = reader[0][:]
-                y_values = reader[1][:]
-            else:
-                y_values = reader[0][:]
-                x_values = reader.index.values
+        path = self.cfg.get(self.section, 'PATH')
+        reader = pd.read_csv(path, header=None, delimiter='\t')
+        col_num = reader.shape[1]
+        if col_num >= 2:
+            return reader
+        else:
+            y_values = reader[0][:]
+            x_values = reader.index.values
+            return pd.DataFrame(x_values, y_values)
 
     def write_output(self, x_values, y_values, frequency, spectral_density, method, window=None):
+        FILENAME = PATH.split('/')[-1]
         filename = self.FILENAME.split('.')[0]
         data = dict(frequency=frequency, spectral_density=spectral_density)
         frame = pd.DataFrame(data)

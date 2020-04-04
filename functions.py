@@ -2,7 +2,8 @@ import prox_tv as ptv
 from scipy import signal
 
 
-def initial_signal(x_values, y_values, filtering=False, filtered_frequency=None):
+def initial_signal(frame, filtering=False, filtered_frequency=None):
+    x_values, y_values = frame[0], frame[1]
     if filtering:
         y_values = ptv.tv1_1d(y_values, filtered_frequency)
     return dict(x=x_values, y=y_values)
