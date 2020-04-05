@@ -45,7 +45,6 @@ class ExcelBuilder(object):
 
     def time_series(self):
         time_series = self.reader()
-        print(time_series)
         if self.filtering == '1':
             data = initial_signal(time_series, filtering=True,
                                   filtered_frequency=self.filtered_frequency())
