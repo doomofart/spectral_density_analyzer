@@ -24,9 +24,9 @@ class ExcelBuilder(object):
         if col_num >= 2:
             return reader
         else:
-            y_values = reader[0]
-            x_values = reader.index.values
-            return pd.DataFrame(dict(x=x_values, y=y_values))
+            reader[1] = reader[0]
+            reader[0] = reader.index.values
+            return reader
 
     def writer(self):
         filename = self.path.split('/')[-1]

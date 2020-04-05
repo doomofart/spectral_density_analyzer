@@ -5,5 +5,5 @@ cfg = configparser.ConfigParser()
 cfg.read('config.ini')
 
 for section in cfg.sections():
-    start = bld.ExcelBuilder(cfg, section)
-    start.write_output()
+    result = bld.ExcelBuilder(cfg, section)
+    result.write_output()
