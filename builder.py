@@ -1,97 +1,77 @@
 import os
+import sys
 import pandas as pd
+import logger as error
+from functions import initial_signal, welch
+from charts import *
 
 
 class ExcelBuilder(object):
     def __init__(self, cfg, section):
         self.cfg = cfg
         self.section = section
+        self.path = self.cfg.get(section, 'PATH')
+        self.window = self.cfg.get(section, 'WINDOW')
+        self.filtering = self.cfg.get(section, 'FILTERING')
 
-    def file_reader(self):
-        path = self.cfg.get(self.section, 'PATH')
-        reader = pd.read_csv(path, header=None, delimiter='\t')
+    def filtered_frequency(self):
+        filtered_frequency = int(self.cfg.get(self.section, 'FILTERED_FREQUENCY'))
+        return filtered_frequency
+
+    def reader(self):
+        reader = pd.read_csv(self.path, header=None, delimiter='\t')
         col_num = reader.shape[1]
         if col_num >= 2:
             return reader
         else:
-            y_values = reader[0][:]
+            y_values = reader[0]
             x_values = reader.index.values
-            return pd.DataFrame(x_values, y_values)
+            return pd.DataFrame(dict(x=x_values, y=y_values))
 
-    def write_output(self, x_values, y_values, frequency, spectral_density, method, window=None):
-        FILENAME = PATH.split('/')[-1]
-        filename = self.FILENAME.split('.')[0]
-        data = dict(frequency=frequency, spectral_density=spectral_density)
-        frame = pd.DataFrame(data)
-        len_frame = len(frame.index)
-
-        # trash
-        data_1 = dict(x=x_values, y=y_values)
-        frame_1 = pd.DataFrame(data_1)
-        len_frame_1 = len(frame_1.index)
-
+    def writer(self):
+        filename = self.path.split('/')[-1]
+        filename = filename.split('.')[0]
         if not os.path.exists('output'):
             os.mkdir('output')
-        if window is not None:
-            writer = pd.ExcelWriter('output/%s_%s_%s_out.xlsx' % (filename, method, window), engine='xlsxwriter')
+        if self.filtering == '1':
+            writer = pd.ExcelWriter('output/%s_%s_%s.xlsx' % (filename, self.window, self.filtered_frequency()),
+                                    engine='xlsxwriter')
+        elif self.filtering == '0':
+            writer = pd.ExcelWriter('output/%s_%s.xlsx' % (filename, self.window), engine='xlsxwriter')
         else:
-            writer = pd.ExcelWriter('output/%s_%s_out.xlsx' % (filename, method), engine='xlsxwriter')
+            error.value_error(self.section, 'FILTERING')
+            sys.exit()
+        return writer
 
-        # trash
-        frame_1.to_excel(writer, index=None, sheet_name='TimeSeries')
+    def time_series(self):
+        time_series = self.reader()
+        print(time_series)
+        if self.filtering == '1':
+            data = initial_signal(time_series, filtering=True,
+                                  filtered_frequency=self.filtered_frequency())
+        elif self.filtering == '0':
+            data = initial_signal(time_series)
+        else:
+            error.value_error(self.section, 'FILTERING')
+            sys.exit()
+        return data
 
-        frame.to_excel(writer, index=None, sheet_name='SpectralDensity')
+    def write_output(self):
+        writer = self.writer()
+
+        time_series_frame = pd.DataFrame(self.time_series())
+        len_time_series_frame = len(time_series_frame.index)
+        values = time_series_frame['y']
+
+        spectral_density_frame = pd.DataFrame(welch(values, window=self.window))
+        len_spectral_density_frame = len(spectral_density_frame.index)
+
+        time_series_frame.to_excel(writer, index=None, sheet_name='TimeSeries')
+        spectral_density_frame.to_excel(writer, index=None, sheet_name='SpectralDensity')
 
         workbook = writer.book
-
-        # trash
-        worksheet = writer.sheets['TimeSeries']
-        time_series_chart = workbook.add_chart({'type': 'scatter'})
-        time_series_chart.add_series({
-            'categories': ['TimeSeries', 1, 0, len_frame_1, 0],
-            'values': ['TimeSeries', 1, 1, len_frame_1, 1],
-        })
-        time_series_chart.set_x_axis({'name': 'x', 'position_axis': 'on_tick'})
-        time_series_chart.set_y_axis({'name': 'y', 'num_format': '0.00E+00', 'major_gridlines': {'visible': False}})
-        time_series_chart.set_legend({'position': 'none'})
-        time_series_chart.set_size({'width': 640, 'height': 480})
-        worksheet.insert_chart('D2', time_series_chart)
-
-        worksheet = writer.sheets['SpectralDensity']
-        spectral_density_chart = workbook.add_chart({'type': 'scatter'})
-        spectral_density_chart.add_series({
-            'categories': ['SpectralDensity', 1, 0, len_frame, 0],
-            'values': ['SpectralDensity', 1, 1, len_frame, 1],
-        })
-        spectral_density_chart.set_x_axis({'name': 'Frequency', 'major_unit': 0.1, 'minor_unit': 0.01, 'max': 0.5,
-                          'position_axis': 'on_tick'})
-        spectral_density_chart.set_y_axis({'name': 'Spectral Density', 'num_format': '0.00E+00', 'major_gridlines': {'visible': False}})
-        spectral_density_chart.set_legend({'position': 'none'})
-        spectral_density_chart.set_size({'width': 640, 'height': 480})
-        worksheet.insert_chart('D2', spectral_density_chart)
-
-        worksheet = workbook.add_worksheet('SpectralDensityLog')
-        spectral_density_log_chart = workbook.add_chart({'type': 'scatter'})
-        spectral_density_log_chart.add_series({
-            'categories': ['SpectralDensity', 2, 0, len_frame, 0],
-            'values': ['SpectralDensity', 2, 1, len_frame, 1],
-            'trendline': {
-                'type': 'power',
-                'display_equation': True,
-                'display_r_squared': True}
-        })
-        spectral_density_log_chart.set_x_axis({'name': 'Frequency (log)',
-                                               'log_base': 10,
-                                               'major_unit': 0.1,
-                                               'minor_unit': 0.01,
-                                               'max': 0.5,
-                                               'position_axis': 'on_tick'})
-        spectral_density_log_chart.set_y_axis(
-            {'name': 'Spectral Density (log)', 'log_base': 10, 'num_format': '0.00E+00',
-             'major_gridlines': {'visible': False}})
-        spectral_density_log_chart.set_legend({'position': 'none'})
-        spectral_density_log_chart.set_size({'width': 640, 'height': 480})
-        worksheet.insert_chart('D2', spectral_density_log_chart)
+        chart_time_series(writer, workbook, len_time_series_frame)
+        chart_spectral_density(writer, workbook, len_spectral_density_frame)
+        chart_spectral_density_log(workbook, len_spectral_density_frame)
 
         writer.save()
-

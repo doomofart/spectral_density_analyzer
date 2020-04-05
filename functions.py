@@ -9,7 +9,7 @@ def initial_signal(frame, filtering=False, filtered_frequency=None):
     return dict(x=x_values, y=y_values)
 
 
-def welch(values, window='hamming'):
+def welch(values, window):
     spectral_density_welch = signal.welch(values, fs=1.0, scaling='density', window=window,
                                           nperseg=len(values))
     frequency = spectral_density_welch[0]
