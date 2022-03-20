@@ -5,6 +5,7 @@
 .idea/
 output/
 data_old/
+data/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
